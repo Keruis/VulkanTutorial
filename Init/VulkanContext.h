@@ -1,3 +1,22 @@
+/*
+ * File:    VulkanContext.h
+ * Author:  Keruis
+ * Date:    2025-07-05
+ * Project: Blueprint Vulkan Renderer
+ * Brief:   核心 Vulkan 上下文管理类的声明。
+ *
+ * Description:
+ *   This header defines the VulkanContext class, which encapsulates the entire
+ *   Vulkan setup and runtime context, including instance, device, swapchain,
+ *   render pass, pipeline, command buffers, and synchronization.
+ *
+ *   本文件包含 VulkanContext 类的声明，该类封装了 Vulkan 渲染所需的
+ *   全部初始化与运行时资源，包括实例、设备、交换链、渲染通道、图形管线、
+ *   命令缓冲区以及同步机制等。
+ *
+ * License: MIT License
+ */
+
 #ifndef BLUEPRINT_VULKANCONTEXT_H
 #define BLUEPRINT_VULKANCONTEXT_H
 

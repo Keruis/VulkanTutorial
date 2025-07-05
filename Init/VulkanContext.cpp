@@ -1,6 +1,25 @@
+/*
+ * File:    VulkanContext.cpp
+ * Author:  Keruis
+ * Date:    2025-07-05
+ * Project: Blueprint Vulkan Renderer
+ * Brief:   VulkanContext 类的具体实现。
+ *
+ * Description:
+ *   Implements the VulkanContext class, which manages the entire
+ *   Vulkan rendering setup and lifecycle, including initialization,
+ *   cleanup, and swapchain recreation.
+ *
+ *   本文件实现了 VulkanContext 类的各个函数，用于管理 Vulkan 的初始化、
+ *   渲染流程、资源释放与交换链重建等逻辑，是渲染核心上下文的关键组件。
+ *
+ * License: MIT License
+ */
+
 #include "VulkanContext.h"
 
-void Vulkan::VulkanContext::init
+void 
+    Vulkan::VulkanContext::init
 (Display* display, Window windowHandel, int width, int height) 
     noexcept 
 {
@@ -54,7 +73,8 @@ void Vulkan::VulkanContext::init
     m_sync          .createSyncObjects          (m_device.GetDevice());
 }
 
-void Vulkan::VulkanContext::cleanup
+void 
+    Vulkan::VulkanContext::cleanup
 () 
     noexcept 
 {
@@ -85,7 +105,8 @@ void Vulkan::VulkanContext::cleanup
     m_instance      .DestroyInstance            ();
 }
 
-void Vulkan::VulkanContext::recreateSwapChain
+void 
+    Vulkan::VulkanContext::recreateSwapChain
 ()
     noexcept 
 {
@@ -95,7 +116,8 @@ void Vulkan::VulkanContext::recreateSwapChain
     m_franeBuffer   .createFramebuffers         (m_device.GetDevice(), m_swapChain.GetSwapChainImageViews(), m_randerPass.GetRenderPass(), m_swapChain.GetExtent2D().width, m_swapChain.GetExtent2D().height);
 }
 
-void Vulkan::VulkanContext::cleanupSwapChain
+void 
+    Vulkan::VulkanContext::cleanupSwapChain
 () 
     noexcept 
 {
