@@ -4,12 +4,12 @@
 namespace LogSc {
 
 template<typename T, size_t R,size_t C>class Matrix;
-template<int Rows, int Cols> using MatrixShort      = LogSc::Matrix<short, Rows, Cols>;
-template<int Rows, int Cols> using MatrixInt        = LogSc::Matrix<int, Rows, Cols>;
-template<int Rows, int Cols> using MatrixFloat      = LogSc::Matrix<float, Rows, Cols>;
-template<int Rows, int Cols> using MatrixDouble     = LogSc::Matrix<double, Rows, Cols>;
-template<int Rows, int Cols> using MatrixLong       = LogSc::Matrix<long, Rows, Cols>;
-template<int Rows, int Cols> using MatrixLongLong   = LogSc::Matrix<long long, Rows, Cols>;
+template<size_t Rows, size_t Cols> using MatrixShort      = LogSc::Matrix<short, Rows, Cols>;
+template<size_t Rows, size_t Cols> using MatrixInt        = LogSc::Matrix<int, Rows, Cols>;
+template<size_t Rows, size_t Cols> using MatrixFloat      = LogSc::Matrix<float, Rows, Cols>;
+template<size_t Rows, size_t Cols> using MatrixDouble     = LogSc::Matrix<double, Rows, Cols>;
+template<size_t Rows, size_t Cols> using MatrixLong       = LogSc::Matrix<long, Rows, Cols>;
+template<size_t Rows, size_t Cols> using MatrixLongLong   = LogSc::Matrix<long long, Rows, Cols>;
 
 template<typename T, size_t R,size_t C>
 class Matrix
@@ -32,11 +32,10 @@ public:
         }
     }
     ~Matrix()=default;
-
     inline T&       operator()(size_t row, size_t col) noexcept         {return matrix_arr[row][col];}
     inline const T& operator()(size_t row, size_t col) const noexcept   {return matrix_arr[row][col];}
-    inline T*       operator[](size_t rc)             noexcept         {return matrix_arr[rc];}
-    inline const T* operator[](size_t rc)             const noexcept   {return matrix_arr[rc];}
+    inline T*       operator[](size_t rc)             noexcept          {return matrix_arr[rc];}
+    inline const T* operator[](size_t rc)             const noexcept    {return matrix_arr[rc];}
     // print matrix
     void print() const {
         for (size_t i = 0; i < R; ++i) {
@@ -57,472 +56,69 @@ void printMatrix(const Matrix<T, R, C>& mat) {
         std::cout << '\n';
     }
 }
-// operator*
-template<typename T, size_t R, size_t C, size_t K>
-Matrix<T, R, K> operator*(const Matrix<T, R, C>& lhs, const Matrix<T, C, K>& rhs) {
-    Matrix<T, R, K> result;
-    for (size_t i = 0; i < R; ++i)
-        for (size_t k = 0; k < C; ++k)
-            for (size_t j = 0; j < K; ++j)
-                result[i][j] += lhs[i][k] * rhs[k][j];
-    return result;
-}
+
 // 乘法通用方法
 template<typename T, size_t R, size_t C, size_t K>
-void multiply(const Matrix<T, R, C>& lhs, const Matrix<T, C, K>& rhs, Matrix<T, R, K>& result) {
+void _multiply(const Matrix<T, R, C>& lhs, const Matrix<T, C, K>& rhs, Matrix<T, R, K>& result) {
     std::fill(&result[0][0], &result[0][0] + R * K, T{0});
     for (size_t i = 0; i < R; ++i)
         for (size_t k = 0; k < C; ++k)
             for (size_t j = 0; j < K; ++j)
                 result[i][j] += lhs[i][k] * rhs[k][j];
 }
-
+// 矩阵泛化版本
 template<typename T, size_t C1, size_t C2, size_t C3>
 struct MatrixSp {
     static void multiply(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs, Matrix<T, C1, C3>& result) {
-        multiply(lhs,rhs,result);
+        printf("generalization %dx%d x %dx%d -> %dx%d\n",C1,C2,C2,C3,C1,C3);
+        _multiply(lhs,rhs,result);
     }
 };
+// operator*
+template<typename T, size_t C1, size_t C2, size_t C3>
+Matrix<T, C1, C3> operator*(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs) {
+    Matrix<T, C1, C3> result;
+    LogSc::MatrixSp<T,C1,C2,C3>::multiply(lhs,rhs,result);
+    return result;
+}
 
-// 1. 2×2 × 2×2 → 2×2
-template<typename T>
-struct MatrixSp<T, 2, 2, 2> {
-    static void multiply(const Matrix<T, 2, 2>& lhs, const Matrix<T, 2, 2>& rhs, Matrix<T, 2, 2>& result) {
-        result[0][0] = lhs[0][0] * rhs[0][0] + lhs[0][1] * rhs[1][0];
-        result[0][1] = lhs[0][0] * rhs[0][1] + lhs[0][1] * rhs[1][1];
-        result[1][0] = lhs[1][0] * rhs[0][0] + lhs[1][1] * rhs[1][0];
-        result[1][1] = lhs[1][0] * rhs[0][1] + lhs[1][1] * rhs[1][1];
-    }
+// 矩阵特化版本
+#define MS_TEMPLATE_CLASS(C1,C2,C3) \
+template<typename T>\
+struct MatrixSp<T, C1, C2, C3> {\
+    static void multiply(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs, Matrix<T, C1, C3>& result);\
 };
-// 2. 2×2 × 2×3 → 2×3
-template<typename T>
-struct MatrixSp<T, 2, 2, 3> {
-    static void multiply(const Matrix<T, 2, 2>& lhs, const Matrix<T, 2, 3>& rhs, Matrix<T, 2, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2];
-    }
+//static void addition(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs, Matrix<T, C1, C3>& result);
+MS_TEMPLATE_CLASS(2,2,2) // 1.  2×2 × 2×2 -> 2×2
+MS_TEMPLATE_CLASS(2,2,3) // 2.  2×2 × 2×3 -> 2×3
+MS_TEMPLATE_CLASS(2,2,4) // 3.  2×2 × 2×4 -> 2×4
+MS_TEMPLATE_CLASS(2,3,2) // 4.  2×3 × 3×2 -> 2×2
+MS_TEMPLATE_CLASS(2,3,3) // 5.  2×3 × 3×3 -> 2×3
+MS_TEMPLATE_CLASS(2,3,4) // 6.  2×3 × 3×4 -> 2×4
+MS_TEMPLATE_CLASS(2,4,2) // 7.  2×4 × 4×2 -> 2×2
+MS_TEMPLATE_CLASS(2,4,3) // 8.  2×4 × 4×3 -> 2×3
+MS_TEMPLATE_CLASS(2,4,4) // 9.  2×4 × 4×4 -> 2×4
+MS_TEMPLATE_CLASS(3,2,2) // 10. 3×2 × 2×2 -> 3×2
+MS_TEMPLATE_CLASS(3,2,3) // 11. 3×2 × 2×3 -> 3×3
+MS_TEMPLATE_CLASS(3,2,4) // 12. 3×2 × 2×4 -> 3×4
+MS_TEMPLATE_CLASS(3,3,2) // 13. 3×3 × 3×2 -> 3×2
+MS_TEMPLATE_CLASS(3,3,3) // 14. 3×3 × 3×3 -> 3×3
+MS_TEMPLATE_CLASS(3,3,4) // 15. 3×3 × 3×4 -> 3×4
+MS_TEMPLATE_CLASS(3,4,2) // 16. 3×4 × 4×2 -> 3×2
+MS_TEMPLATE_CLASS(3,4,3) // 17. 3×4 × 4×3 -> 3×3
+MS_TEMPLATE_CLASS(3,4,4) // 18. 3×4 × 4×4 -> 3×4
+MS_TEMPLATE_CLASS(4,2,2) // 19. 4×2 × 2×2 -> 4×2
+MS_TEMPLATE_CLASS(4,2,3) // 20. 4×2 × 2×3 -> 4×3
+MS_TEMPLATE_CLASS(4,2,4) // 21. 4×2 × 2×4 -> 4×4
+MS_TEMPLATE_CLASS(4,3,2) // 22. 4×3 × 3×2 -> 4×2
+MS_TEMPLATE_CLASS(4,3,3) // 23. 4×3 × 3×3 -> 4×3
+MS_TEMPLATE_CLASS(4,3,4) // 24. 4×3 × 3×4 -> 4×4
+MS_TEMPLATE_CLASS(4,4,2) // 25. 4×4 × 4×2 -> 4×2
+MS_TEMPLATE_CLASS(4,4,3) // 26. 4×4 × 4×3 -> 4×3
+MS_TEMPLATE_CLASS(4,4,4) // 27. 4×4 × 4×4 -> 4×4
+
 };
-// 3. 2×2 × 2×4 → 2×4
-template<typename T>
-struct MatrixSp<T, 2, 2, 4> {
-    static void multiply(const Matrix<T, 2, 2>& lhs, const Matrix<T, 2, 4>& rhs, Matrix<T, 2, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3];
-    }
-};
-// 4. 2×3 × 3×2 → 2×2
-template<typename T>
-struct MatrixSp<T, 2, 3, 2> {
-    static void multiply(const Matrix<T, 2, 3>& lhs, const Matrix<T, 3, 2>& rhs, Matrix<T, 2, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-    }
-};
-// 5. 2×3 × 3×3 → 2×3
-template<typename T>
-struct MatrixSp<T, 2, 3, 3> {
-    static void multiply(const Matrix<T, 2, 3>& lhs, const Matrix<T, 3, 3>& rhs, Matrix<T, 2, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2];
-    }
-};
-// 6. 2×3 × 3×4 → 2×4
-template<typename T>
-struct MatrixSp<T, 2, 3, 4> {
-    static void multiply(const Matrix<T, 2, 3>& lhs, const Matrix<T, 3, 4>& rhs, Matrix<T, 2, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3] + lhs[0][2]*rhs[2][3];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3] + lhs[1][2]*rhs[2][3];
-    }
-};
-// 7. 2×4 × 4×2 → 2×2
-template<typename T>
-struct MatrixSp<T, 2, 4, 2> {
-    static void multiply(const Matrix<T, 2, 4>& lhs, const Matrix<T, 4, 2>& rhs, Matrix<T, 2, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-    }
-};
-// 8. 2×4 × 4×3 → 2×3
-template<typename T>
-struct MatrixSp<T, 2, 4, 3> {
-    static void multiply(const Matrix<T, 2, 4>& lhs, const Matrix<T, 4, 3>& rhs, Matrix<T, 2, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2] + lhs[0][3]*rhs[3][2];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2] + lhs[1][3]*rhs[3][2];
-    }
-};
-// 9. 2×4 × 4×4 → 2×4
-template<typename T>
-struct MatrixSp<T, 2, 4, 4> {
-    static void multiply(const Matrix<T, 2, 4>& lhs, const Matrix<T, 4, 4>& rhs, Matrix<T, 2, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2] + lhs[0][3]*rhs[3][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3] + lhs[0][2]*rhs[2][3] + lhs[0][3]*rhs[3][3];
 
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2] + lhs[1][3]*rhs[3][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3] + lhs[1][2]*rhs[2][3] + lhs[1][3]*rhs[3][3];
-    }
-};
-// 10. 3×2 × 2×2 → 3×2
-template<typename T>
-struct MatrixSp<T, 3, 2, 2> {
-    static void multiply(const Matrix<T, 3, 2>& lhs, const Matrix<T, 2, 2>& rhs, Matrix<T, 3, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1];
-    }
-};
-// 11. 3×2 × 2×3 → 3×3
-template<typename T>
-struct MatrixSp<T, 3, 2, 3> {
-    static void multiply(const Matrix<T, 3, 2>& lhs, const Matrix<T, 2, 3>& rhs, Matrix<T, 3, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2];
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2];
-    }
-};
-// 12. 3×2 × 2×4 → 3×4
-template<typename T>
-struct MatrixSp<T, 3, 2, 4> {
-    static void multiply(const Matrix<T, 3, 2>& lhs, const Matrix<T, 2, 4>& rhs, Matrix<T, 3, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3];
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2];
-        result[2][3] = lhs[2][0]*rhs[0][3] + lhs[2][1]*rhs[1][3];
-    }
-};
-// 13. 3×3 × 3×2 → 3×2
-template<typename T>
-struct MatrixSp<T, 3, 3, 2> {
-    static void multiply(const Matrix<T, 3, 3>& lhs, const Matrix<T, 3, 2>& rhs, Matrix<T, 3, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1];
-    }
-};
-// 14. 3×3 × 3×3 → 3×3
-template<typename T>
-struct MatrixSp<T, 3, 3, 3> {
-    static void multiply(const Matrix<T, 3, 3>& lhs, const Matrix<T, 3, 3>& rhs, Matrix<T, 3, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2];
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2];
-    }
-};
-// 15. 3×3 × 3×4 → 3×4
-template<typename T>
-struct MatrixSp<T, 3, 3, 4> {
-    static void multiply(const Matrix<T, 3, 3>& lhs, const Matrix<T, 3, 4>& rhs, Matrix<T, 3, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3] + lhs[0][2]*rhs[2][3];
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3] + lhs[1][2]*rhs[2][3];
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2];
-        result[2][3] = lhs[2][0]*rhs[0][3] + lhs[2][1]*rhs[1][3] + lhs[2][2]*rhs[2][3];
-    }
-};
-// 16. 3×4 × 4×2 → 3×2
-template<typename T>
-struct MatrixSp<T, 3, 4, 2> {
-    static void multiply(const Matrix<T, 3, 4>& lhs, const Matrix<T, 4, 2>& rhs, Matrix<T, 3, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0] + lhs[2][3]*rhs[3][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1] + lhs[2][3]*rhs[3][1];
-    }
-};
-// 17. 3×4 × 4×3 → 3×3
-template<typename T>
-struct MatrixSp<T, 3, 4, 3> {
-    static void multiply(const Matrix<T, 3, 4>& lhs, const Matrix<T, 4, 3>& rhs, Matrix<T, 3, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2] + lhs[0][3]*rhs[3][2];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2] + lhs[1][3]*rhs[3][2];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0] + lhs[2][3]*rhs[3][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1] + lhs[2][3]*rhs[3][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2] + lhs[2][3]*rhs[3][2];
-    }
-};
-// 18. 3×4 × 4×4 → 3×4
-template<typename T>
-struct MatrixSp<T, 3, 4, 4> {
-    static void multiply(const Matrix<T, 3, 4>& lhs, const Matrix<T, 4, 4>& rhs, Matrix<T, 3, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2] + lhs[0][3]*rhs[3][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3] + lhs[0][2]*rhs[2][3] + lhs[0][3]*rhs[3][3];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2] + lhs[1][3]*rhs[3][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3] + lhs[1][2]*rhs[2][3] + lhs[1][3]*rhs[3][3];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0] + lhs[2][3]*rhs[3][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1] + lhs[2][3]*rhs[3][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2] + lhs[2][3]*rhs[3][2];
-        result[2][3] = lhs[2][0]*rhs[0][3] + lhs[2][1]*rhs[1][3] + lhs[2][2]*rhs[2][3] + lhs[2][3]*rhs[3][3];
-    }
-};
-// 19. 4×2 × 2×2 → 4×2
-template<typename T>
-struct MatrixSp<T, 4, 2, 2> {
-    static void multiply(const Matrix<T, 4, 2>& lhs, const Matrix<T, 2, 2>& rhs, Matrix<T, 4, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1];
-    }
-};
-// 20. 4×2 × 2×3 → 4×3
-template<typename T>
-struct MatrixSp<T, 4, 2, 3> {
-    static void multiply(const Matrix<T, 4, 2>& lhs, const Matrix<T, 2, 3>& rhs, Matrix<T, 4, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1];
-        result[3][2] = lhs[3][0]*rhs[0][2] + lhs[3][1]*rhs[1][2];
-    }
-};
-// 21. 4×2 × 2×4 → 4×4
-template<typename T>
-struct MatrixSp<T, 4, 2, 4> {
-    static void multiply(const Matrix<T, 4, 2>& lhs, const Matrix<T, 2, 4>& rhs, Matrix<T, 4, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2];
-        result[2][3] = lhs[2][0]*rhs[0][3] + lhs[2][1]*rhs[1][3];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1];
-        result[3][2] = lhs[3][0]*rhs[0][2] + lhs[3][1]*rhs[1][2];
-        result[3][3] = lhs[3][0]*rhs[0][3] + lhs[3][1]*rhs[1][3];
-    }
-};
-// 22. 4×3 × 3×2 → 4×2
-template<typename T>
-struct MatrixSp<T, 4, 3, 2> {
-    static void multiply(const Matrix<T, 4, 3>& lhs, const Matrix<T, 3, 2>& rhs, Matrix<T, 4, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0] + lhs[3][2]*rhs[2][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1] + lhs[3][2]*rhs[2][1];
-    }
-};
-// 23. 4×3 × 3×3 → 4×3
-template<typename T>
-struct MatrixSp<T, 4, 3, 3> {
-    static void multiply(const Matrix<T, 4, 3>& lhs, const Matrix<T, 3, 3>& rhs, Matrix<T, 4, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0] + lhs[3][2]*rhs[2][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1] + lhs[3][2]*rhs[2][1];
-        result[3][2] = lhs[3][0]*rhs[0][2] + lhs[3][1]*rhs[1][2] + lhs[3][2]*rhs[2][2];
-    }
-};
-// 24. 4×3 × 3×4 → 4×4
-template<typename T>
-struct MatrixSp<T, 4, 3, 4> {
-    static void multiply(const Matrix<T, 4, 3>& lhs, const Matrix<T, 3, 4>& rhs, Matrix<T, 4, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3] + lhs[0][2]*rhs[2][3];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3] + lhs[1][2]*rhs[2][3];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2];
-        result[2][3] = lhs[2][0]*rhs[0][3] + lhs[2][1]*rhs[1][3] + lhs[2][2]*rhs[2][3];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0] + lhs[3][2]*rhs[2][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1] + lhs[3][2]*rhs[2][1];
-        result[3][2] = lhs[3][0]*rhs[0][2] + lhs[3][1]*rhs[1][2] + lhs[3][2]*rhs[2][2];
-        result[3][3] = lhs[3][0]*rhs[0][3] + lhs[3][1]*rhs[1][3] + lhs[3][2]*rhs[2][3];
-    }
-};
-// 25. 4×4 × 4×2 → 4×2
-template<typename T>
-struct MatrixSp<T, 4, 4, 2> {
-    static void multiply(const Matrix<T, 4, 4>& lhs, const Matrix<T, 4, 2>& rhs, Matrix<T, 4, 2>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0] + lhs[2][3]*rhs[3][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1] + lhs[2][3]*rhs[3][1];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0] + lhs[3][2]*rhs[2][0] + lhs[3][3]*rhs[3][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1] + lhs[3][2]*rhs[2][1] + lhs[3][3]*rhs[3][1];
-    }
-};
-// 26. 4×4 × 4×3 → 4×3
-template<typename T>
-struct MatrixSp<T, 4, 4, 3> {
-    static void multiply(const Matrix<T, 4, 4>& lhs, const Matrix<T, 4, 3>& rhs, Matrix<T, 4, 3>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2] + lhs[0][3]*rhs[3][2];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2] + lhs[1][3]*rhs[3][2];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0] + lhs[2][3]*rhs[3][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1] + lhs[2][3]*rhs[3][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2] + lhs[2][3]*rhs[3][2];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0] + lhs[3][2]*rhs[2][0] + lhs[3][3]*rhs[3][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1] + lhs[3][2]*rhs[2][1] + lhs[3][3]*rhs[3][1];
-        result[3][2] = lhs[3][0]*rhs[0][2] + lhs[3][1]*rhs[1][2] + lhs[3][2]*rhs[2][2] + lhs[3][3]*rhs[3][2];
-    }
-};
-// 27. 4×4 × 4×4 → 4×4
-template<typename T>
-struct MatrixSp<T, 4, 4, 4> {
-    static void multiply(const Matrix<T, 4, 4>& lhs, const Matrix<T, 4, 4>& rhs, Matrix<T, 4, 4>& result) {
-        result[0][0] = lhs[0][0]*rhs[0][0] + lhs[0][1]*rhs[1][0] + lhs[0][2]*rhs[2][0] + lhs[0][3]*rhs[3][0];
-        result[0][1] = lhs[0][0]*rhs[0][1] + lhs[0][1]*rhs[1][1] + lhs[0][2]*rhs[2][1] + lhs[0][3]*rhs[3][1];
-        result[0][2] = lhs[0][0]*rhs[0][2] + lhs[0][1]*rhs[1][2] + lhs[0][2]*rhs[2][2] + lhs[0][3]*rhs[3][2];
-        result[0][3] = lhs[0][0]*rhs[0][3] + lhs[0][1]*rhs[1][3] + lhs[0][2]*rhs[2][3] + lhs[0][3]*rhs[3][3];
-
-        result[1][0] = lhs[1][0]*rhs[0][0] + lhs[1][1]*rhs[1][0] + lhs[1][2]*rhs[2][0] + lhs[1][3]*rhs[3][0];
-        result[1][1] = lhs[1][0]*rhs[0][1] + lhs[1][1]*rhs[1][1] + lhs[1][2]*rhs[2][1] + lhs[1][3]*rhs[3][1];
-        result[1][2] = lhs[1][0]*rhs[0][2] + lhs[1][1]*rhs[1][2] + lhs[1][2]*rhs[2][2] + lhs[1][3]*rhs[3][2];
-        result[1][3] = lhs[1][0]*rhs[0][3] + lhs[1][1]*rhs[1][3] + lhs[1][2]*rhs[2][3] + lhs[1][3]*rhs[3][3];
-
-        result[2][0] = lhs[2][0]*rhs[0][0] + lhs[2][1]*rhs[1][0] + lhs[2][2]*rhs[2][0] + lhs[2][3]*rhs[3][0];
-        result[2][1] = lhs[2][0]*rhs[0][1] + lhs[2][1]*rhs[1][1] + lhs[2][2]*rhs[2][1] + lhs[2][3]*rhs[3][1];
-        result[2][2] = lhs[2][0]*rhs[0][2] + lhs[2][1]*rhs[1][2] + lhs[2][2]*rhs[2][2] + lhs[2][3]*rhs[3][2];
-        result[2][3] = lhs[2][0]*rhs[0][3] + lhs[2][1]*rhs[1][3] + lhs[2][2]*rhs[2][3] + lhs[2][3]*rhs[3][3];
-
-        result[3][0] = lhs[3][0]*rhs[0][0] + lhs[3][1]*rhs[1][0] + lhs[3][2]*rhs[2][0] + lhs[3][3]*rhs[3][0];
-        result[3][1] = lhs[3][0]*rhs[0][1] + lhs[3][1]*rhs[1][1] + lhs[3][2]*rhs[2][1] + lhs[3][3]*rhs[3][1];
-        result[3][2] = lhs[3][0]*rhs[0][2] + lhs[3][1]*rhs[1][2] + lhs[3][2]*rhs[2][2] + lhs[3][3]*rhs[3][2];
-        result[3][3] = lhs[3][0]*rhs[0][3] + lhs[3][1]*rhs[1][3] + lhs[3][2]*rhs[2][3] + lhs[3][3]*rhs[3][3];
-    }
-};
-};
+#include "log159matrix.tpp"
 #endif
 
