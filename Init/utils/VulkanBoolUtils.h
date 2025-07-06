@@ -37,7 +37,7 @@ namespace Vulkan::Utils {
 
         template<typename Callback>
         constexpr BoolConditionResult&& then
-            (Callback&& cb) && 
+                (Callback&& cb) &&
         {
             if (result_) {
                 std::forward<Callback>(cb)();
@@ -47,7 +47,7 @@ namespace Vulkan::Utils {
 
         template<typename Callback>
         constexpr BoolConditionResult&& otherwise
-            (Callback&& cb) && 
+                (Callback&& cb) &&
         {
             if (!result_) {
                 std::forward<Callback>(cb)();
@@ -60,21 +60,21 @@ namespace Vulkan::Utils {
 
     template<typename... Args>
     constexpr BoolConditionResult K_MixedAll
-        (Args&&... args) 
+            (Args&&... args)
     {
         return BoolConditionResult{(... && static_cast<bool>(args))};
     }
 
     template<typename... Args>
     constexpr BoolConditionResult K_MixedAny
-        (Args&&... args) 
+            (Args&&... args)
     {
         return BoolConditionResult{(... || static_cast<bool>(args))};
     }
 
     template<typename... Args>
     constexpr BoolConditionResult K_MixedNone
-        (Args&&... args) 
+            (Args&&... args)
     {
         return BoolConditionResult{!(... || static_cast<bool>(args))};
     }

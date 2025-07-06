@@ -135,7 +135,7 @@ void
                     )
                     .default_(
                             []{
-
+                                std::unreachable();
                             }
                     );
             __asm__ __volatile__("nop\n\t");

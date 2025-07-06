@@ -29,7 +29,7 @@
 namespace Vulkan::Utils {
     template <bool Cond, typename ThenFn, typename ElseFn>
     constexpr void K_constexpr_if
-        (ThenFn&& then_fn, ElseFn&& else_fn) 
+            (ThenFn&& then_fn, ElseFn&& else_fn)
     {
         if constexpr (Cond) {
             then_fn();
@@ -40,7 +40,7 @@ namespace Vulkan::Utils {
 
     template <bool Cond, typename ThenFn>
     constexpr void K_constexpr_if
-        (ThenFn&& then_fn) 
+            (ThenFn&& then_fn)
     {
         if constexpr (Cond) {
             then_fn();

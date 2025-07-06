@@ -17,7 +17,7 @@
  * License: MIT License
  */
 
- #include "KDebug.h"
+#include "KDebug.h"
 
 Vulkan::Utils::KDebugStream::KDebugStream
 (const char *file, int line, const char *func)
@@ -34,3 +34,4 @@ Vulkan::Utils::KDebugStream::~KDebugStream() {
               << m_stream.str() << "\033[0m" << std::endl;
 #endif
 }
+

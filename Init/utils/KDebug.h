@@ -40,6 +40,7 @@ namespace Vulkan::Utils {
     class KDebugStream {
     public:
         KDebugStream(const char *file, int line, const char *func);
+
         ~KDebugStream();
 
         template<typename Ty_>
@@ -52,9 +53,9 @@ namespace Vulkan::Utils {
 
     private:
         std::ostringstream  m_stream;
-        const char*         m_file;
+        const char *        m_file;
         int                 m_line;
-        const char*         m_func;
+        const char *        m_func;
     };
 }
 #if KDEBUG_ENABLED

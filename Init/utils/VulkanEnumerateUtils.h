@@ -34,7 +34,7 @@
 namespace Vulkan::Utils {
     template <typename Ty_, typename Fn_>
     [[nodiscard]] std::vector<Ty_> K_vkEnumerateVector
-        (Fn_ enumerateFn) 
+            (Fn_ enumerateFn)
     {
         uint32_t count = 0;
         if (enumerateFn(&count, nullptr) != VK_SUCCESS) {
