@@ -36,16 +36,23 @@ int main() {
 // Matrix And Value +/-*
 /*
     {
-        LogSc::MatrixInt<4,4> m24,result;
-        randomInitialize(m24, 1, 50);
-        printMatrix(m24);
-        LogSc::MatrixFundamentalSp<int,4,4>::scalar_add_matrix(3,m24,result);
+        LogSc::MatrixDouble<4,3> m42,result;
+        randomInitialize(m42, 1, 50);
+        printMatrix(m42);
+        LogSc::MatrixFundamentalSp<double,4,3>::scalar_add_matrix(3,m42,result);
         printMatrix(result);
-        LogSc::MatrixFundamentalSp<int,4,4>::scalar_mul_matrix(2,m24,result);
-        printMatrix(result);
+        LogSc::MatrixFundamentalSp<double,4,3>::scalar_mul_matrix(2,m42,result);
+        printMatrix(1000.0*m42);
+        printMatrix(1000.0+m42);
+        printMatrix(1000.0-m42);
+        printMatrix(1000.0/m42);
+        printMatrix(m42*1000.0);
+        printMatrix(m42+1000.0);
+        printMatrix(m42-1000.0);
+        printMatrix(m42/1000.0);
+
     }
 */
-
 // A * B Matrix Matrix
 /*
     {

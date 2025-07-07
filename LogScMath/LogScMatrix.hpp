@@ -35,7 +35,6 @@ public:
     inline T*       operator[](size_t rc)              noexcept          {return matrix_arr[rc];      }
     inline const T* operator[](size_t rc)              const noexcept    {return matrix_arr[rc];      }
 
-
 // ---------------------------------------------- 暂时实现，之后会改 ----------------------------------------------
     // 不改变-比较
     inline bool operator==(const Matrix& other) const {
@@ -117,7 +116,7 @@ public:
     inline Matrix& operator--() noexcept {
         return (*this -= static_cast<T>(1));
     }
-// ---------------------------------------------- 暂时实现，之后会改 ----------------------------------------------
+// -------------------------------------------------------------------------------------------------------------
 };
 /* ---- 乘法通用 ---- */
 template<typename T, size_t C1, size_t C2, size_t C3>
@@ -134,7 +133,6 @@ constexpr void _multiply(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& 
 template<typename T, size_t C1, size_t C2, size_t C3>
 struct MatrixMultiplySp {
     constexpr static void multiply(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs, Matrix<T, C1, C3>& result) noexcept{
-        printf("generalization %dx%d x %dx%d -> %dx%d\n",C1,C2,C2,C3,C1,C3);
         _multiply(lhs,rhs,result);
     }
 };
@@ -236,7 +234,6 @@ constexpr void _divide(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C2>& rh
 template<typename T, size_t C1, size_t C2>
 struct MatrixDivideSp {
     constexpr static void divide(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C2>& rhs, Matrix<T, C1, C2>& result) noexcept{
-        printf("generalization %dx%d / %dx%d -> %dx%d\n",C1,C2,C2,C2,C1,C2);
         _divide(lhs,rhs,result);
     }
 };
@@ -261,7 +258,6 @@ constexpr void _add(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, 
 template<typename T, size_t C1, size_t C2>
 struct MatrixAddSp {
     constexpr static void add(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, Matrix<T, C1, C2>& result) noexcept{
-        printf("generalization %dx%d + %dx%d -> %dx%d\n",C1,C2,C1,C2,C1,C2);
         _add(lhs,rhs,result);
     }
 };
@@ -299,7 +295,6 @@ constexpr void _subtract(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& 
 template<typename T, size_t C1, size_t C2>
 struct MatrixSubtractSp {
     constexpr static void subtract(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, Matrix<T, C1, C2>& result) noexcept{
-        printf("generalization %dx%d - %dx%d -> %dx%d\n",C1,C2,C1,C2,C1,C2);
         _subtract(lhs,rhs,result);
     }
 };
@@ -326,71 +321,7 @@ MATRIXSUBTRACTSP_TEMPLATE_CLASS(4, 2)
 MATRIXSUBTRACTSP_TEMPLATE_CLASS(4, 3)
 MATRIXSUBTRACTSP_TEMPLATE_CLASS(4, 4)
 
-// 数乘 乘数 数除 除数 数加 加数 数减 减数
-/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 一般实现 ---- */
-// Matrix ±*/ scalar
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator+(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
-    Matrix<T, R, C> result;
-    for (size_t i = 0; i < R; ++i)
-        for (size_t j = 0; j < C; ++j)
-            result[i][j] = mat[i][j] + scalar;
-    return result;
-}
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator-(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
-    Matrix<T, R, C> result;
-    for (size_t i = 0; i < R; ++i)
-        for (size_t j = 0; j < C; ++j)
-            result[i][j] = mat[i][j] - scalar;
-    return result;
-}
-
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator*(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
-    Matrix<T, R, C> result;
-    for (size_t i = 0; i < R; ++i)
-        for (size_t j = 0; j < C; ++j)
-            result[i][j] = mat[i][j] * scalar;
-    return result;
-}
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator/(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
-    Matrix<T, R, C> result;
-    for (size_t i = 0; i < R; ++i)
-        for (size_t j = 0; j < C; ++j)
-            result[i][j] = mat[i][j] / scalar;
-    return result;
-}
-// scalar ±*/ Matrix
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator+(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
-    return mat + scalar;
-}
-
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator-(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
-    Matrix<T, R, C> result;
-    for (size_t i = 0; i < R; ++i)
-        for (size_t j = 0; j < C; ++j)
-            result[i][j] = scalar - mat[i][j];
-    return result;
-}
-
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator*(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
-    return mat * scalar;
-}
-template<typename T, size_t R, size_t C>
-constexpr Matrix<T, R, C> operator/(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
-    Matrix<T, R, C> result;
-    for (size_t i = 0; i < R; ++i)
-        for (size_t j = 0; j < C; ++j)
-            result[i][j] = scalar / mat[i][j];
-    return result;
-}
-
-/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 引用实现 ---- */
+/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 （通用） ---- */
 // scalar + matrix → result
 template<typename T, size_t R, size_t C>
 constexpr void _scalar_add_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept{
@@ -444,7 +375,7 @@ constexpr void _matrix_div_scalar(const Matrix<T, R, C>& mat, const T& scalar, M
             result[i][j] = mat[i][j] / scalar;
 }
 
-/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 最好实现（对运算特化） ---- */
+/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 最好实现（特化实现） ---- */
 
 /* ---- 算数泛化 ---- */
 template<typename T, size_t R, size_t C>
@@ -475,6 +406,57 @@ struct MatrixFundamentalSp {
     }
 };
 
+/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 （重载） ---- */
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator+(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::scalar_add_matrix(scalar,mat,result);
+    return result;
+}
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator+(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::matrix_add_scalar(mat,scalar,result);
+    return result;
+}
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator-(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::scalar_sub_matrix(scalar,mat,result);
+    return result;
+}
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator-(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::matrix_sub_scalar(mat,scalar,result);
+    return result;
+}
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator*(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::scalar_mul_matrix(scalar,mat,result);
+    return result;
+}
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator*(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::matrix_mul_scalar(mat,scalar,result);
+    return result;
+}
+//PS - 标量 / 矩阵 这种东西存在么...
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator/(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::scalar_div_matrix(scalar,mat,result);
+    return result;
+}
+template<typename T, size_t R, size_t C>
+constexpr Matrix<T, R, C> operator/(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
+    Matrix<T, R, C> result;
+    MatrixFundamentalSp<T,R,C>::matrix_div_scalar(mat,scalar,result);
+    return result;
+}
+/* ---- 算数特化 ---- */
 #define MATRIXFUNDAMENTALSP_TEMPLATE_CLASS(R,C) \
 template<typename T>\
 struct MatrixFundamentalSp<T, R, C>\

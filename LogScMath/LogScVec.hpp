@@ -35,7 +35,6 @@ constexpr void __multiply_vc(const Vec<T, C1>& lhs, const Matrix<T, C1, C2>& rhs
 template<typename T, size_t C1, size_t C2>
 struct VecMatrixMultiplySp {
     constexpr static void multiply(const Vec<T, C1>& lhs, const Matrix<T, C1, C2>& rhs, Vec<T,C2>& result) noexcept{
-        printf("generalization vec %dx%d x %dx%d -> %dx%d\n",1,C1,C1,C2,1,C2);
         __multiply_vc(lhs,rhs,result);
     }
 };
@@ -73,7 +72,6 @@ constexpr void __add_vec(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1
 template<typename T, size_t C1>
 struct VecMatrixAddSp {
     constexpr static void add(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept{
-        printf("generalization %dx%d + %dx%d -> %dx%d\n",1,C1,1,C1,1,C1);
         __add_vec(lhs,rhs,result);
     }
 };
@@ -104,7 +102,6 @@ constexpr void __subtract_vec(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<
 template<typename T, size_t C1>
 struct VecMatrixSubtractSp {
     constexpr static void subtract(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept{
-        printf("generalization %dx%d - %dx%d -> %dx%d\n",1,C1,1,C1,1,C1);
         __subtract_vec(lhs,rhs,result);
     }
 };
