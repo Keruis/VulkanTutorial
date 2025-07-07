@@ -1,5 +1,5 @@
 #include "LogScMatrix.hpp"
-#define TS_MULTIPLY(C1,C2,C3) template<typename T> void MatrixMultiplySp<T,C1,C2,C3>::multiply(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs, Matrix<T, C1, C3>& result){\
+#define TS_MULTIPLY(C1,C2,C3) template<typename T> constexpr void MatrixMultiplySp<T,C1,C2,C3>::multiply(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs, Matrix<T, C1, C3>& result) noexcept{\
 printf("specialization %dx%d x %dx%d -> %dx%d\n",C1,C2,C2,C3,C1,C3);
 
 namespace LogSc  {

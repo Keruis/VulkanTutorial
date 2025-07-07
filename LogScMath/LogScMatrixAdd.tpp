@@ -1,12 +1,11 @@
 #include "LogScMatrix.hpp"
-
-#define TS_ADDITION(C1,C2) template<typename T> void MatrixAdditionSp<T,C1,C2>::addition(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, Matrix<T, C1, C2>& result){\
+#define TS_ADD(C1,C2) template<typename T> constexpr void MatrixAddSp<T,C1,C2>::add(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, Matrix<T, C1, C2>& result) noexcept{\
 printf("specialization %dx%d + %dx%d -> %dx%d\n",C1,C2,C1,C2,C1,C2);
     
 namespace LogSc  {
     
     // 2x2 矩阵加法
-    TS_ADDITION(2,2)
+    TS_ADD(2,2)
         result[0][0] = lhs[0][0]+rhs[0][0];
         result[0][1] = lhs[0][1]+rhs[0][1];
 
@@ -15,7 +14,7 @@ namespace LogSc  {
     }
 
     // 2x3 矩阵加法
-    TS_ADDITION(2,3)
+    TS_ADD(2,3)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
         result[0][2] = lhs[0][2] + rhs[0][2];
@@ -26,7 +25,7 @@ namespace LogSc  {
     }
 
     // 2x4 矩阵加法
-    TS_ADDITION(2,4)
+    TS_ADD(2,4)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
         result[0][2] = lhs[0][2] + rhs[0][2];
@@ -39,7 +38,7 @@ namespace LogSc  {
     }
 
     // 3x2 矩阵加法
-    TS_ADDITION(3,2)
+    TS_ADD(3,2)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
 
@@ -51,7 +50,7 @@ namespace LogSc  {
     }
 
     // 3x3 矩阵加法
-    TS_ADDITION(3,3)
+    TS_ADD(3,3)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
         result[0][2] = lhs[0][2] + rhs[0][2];
@@ -66,7 +65,7 @@ namespace LogSc  {
     }
 
     // 3x4 矩阵加法
-    TS_ADDITION(3,4)
+    TS_ADD(3,4)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
         result[0][2] = lhs[0][2] + rhs[0][2];
@@ -84,7 +83,7 @@ namespace LogSc  {
     }
 
     // 4x2 矩阵加法
-    TS_ADDITION(4,2)
+    TS_ADD(4,2)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
 
@@ -99,7 +98,7 @@ namespace LogSc  {
     }
 
     // 4x3 矩阵加法
-    TS_ADDITION(4,3)
+    TS_ADD(4,3)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
         result[0][2] = lhs[0][2] + rhs[0][2];
@@ -118,7 +117,7 @@ namespace LogSc  {
     }
 
     // 4x4 矩阵加法
-    TS_ADDITION(4,4)
+    TS_ADD(4,4)
         result[0][0] = lhs[0][0] + rhs[0][0];
         result[0][1] = lhs[0][1] + rhs[0][1];
         result[0][2] = lhs[0][2] + rhs[0][2];
