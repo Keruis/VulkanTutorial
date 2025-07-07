@@ -19,9 +19,8 @@ public:
     Vec() noexcept :Matrix<T, 1, C>(){}
     Vec(std::initializer_list<T> init)noexcept :Matrix<T, 1, C>({init}){}
     ~Vec() = default;
-
 };
-/// -------------- 针对向量 和 矩阵 --------------
+/// -------------- 针对 向量 和 矩阵 --------------
 
 /* ---- 乘法通用 ---- */
 template<typename T, size_t C1, size_t C2>
@@ -64,7 +63,7 @@ VECMATRIXMULTIPLYSP_TEMPLATE_CLASS(4,2)
 VECMATRIXMULTIPLYSP_TEMPLATE_CLASS(4,3)
 VECMATRIXMULTIPLYSP_TEMPLATE_CLASS(4,4)
 
-/// -------------- 针对向量 和 向量 --------------
+/// -------------- 针对 向量 和 向量 --------------
 /* ---- 加法通用 ---- */
 template<typename T, size_t C1>
 constexpr void __add_vec(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept {

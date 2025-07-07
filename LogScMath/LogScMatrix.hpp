@@ -11,53 +11,27 @@ template<size_t Rows, size_t Cols> using MatrixDouble     = LogSc::Matrix<double
 template<size_t Rows, size_t Cols> using MatrixLong       = LogSc::Matrix<long, Rows, Cols>;
 template<size_t Rows, size_t Cols> using MatrixLongLong   = LogSc::Matrix<long long, Rows, Cols>;
 
-template<typename T, size_t R,size_t C>
+template<typename T, size_t R, size_t C>
 class Matrix
 {
 protected:
     T matrix_arr[R][C];
 public:
-    static constexpr const size_t Rows = R;
-    static constexpr const size_t Cols = C;
-public:
-    Matrix() noexcept {
-        std::fill(&matrix_arr[0][0], &matrix_arr[0][0] + R * C, T{0});
-    }
-    Matrix(std::initializer_list<std::initializer_list<T>> init) noexcept{
-        std::size_t i = 0;
-        for (const auto& row : init) {
-            std::copy(row.begin(), row.end(), matrix_arr[i++]);
-        }
-    }
-    Matrix(const Matrix& other) noexcept {
-        *this = other;
-    }
-    Matrix(Matrix&& other) noexcept {
-        *this = std::move(other);
-    }
-    Matrix& operator=(const Matrix& other) noexcept {
-        if (this != &other) {
-            for (size_t i = 0; i < R; ++i) {
-                std::copy(other.matrix_arr[i], other.matrix_arr[i] + C, matrix_arr[i]);
-            }
-        }
-        return *this;
-    }
-    Matrix& operator=(Matrix&& other) noexcept {
-        if (this != &other) {
-            for (size_t i = 0; i < R; ++i) {
-                for (size_t j = 0; j < C; ++j) {
-                    matrix_arr[i][j] = std::move(other.matrix_arr[i][j]);
-                }
-            }
-        }
-        return *this;
-    }
+    static constexpr size_t Rows = R;
+    static constexpr size_t Cols = C;
+
+    Matrix() noexcept;
+    Matrix(std::initializer_list<std::initializer_list<T>> init) noexcept;
+    Matrix(const Matrix& other) noexcept;
+    Matrix(Matrix&& other) noexcept;
+    Matrix& operator=(const Matrix& other) noexcept;
+    Matrix& operator=(Matrix&& other) noexcept;
     ~Matrix() = default;
-    T&       operator()(size_t row, size_t col) noexcept          {return matrix_arr[row][col];}
-    const T& operator()(size_t row, size_t col) const noexcept    {return matrix_arr[row][col];}
-    T*       operator[](size_t rc)              noexcept          {return matrix_arr[rc];      }
-    const T* operator[](size_t rc)              const noexcept    {return matrix_arr[rc];      }
+
+    inline T&       operator()(size_t row, size_t col) noexcept          {return matrix_arr[row][col];}
+    inline const T& operator()(size_t row, size_t col) const noexcept    {return matrix_arr[row][col];}
+    inline T*       operator[](size_t rc)              noexcept          {return matrix_arr[rc];      }
+    inline const T* operator[](size_t rc)              const noexcept    {return matrix_arr[rc];      }
 };
 /* ---- 乘法通用 ---- */
 template<typename T, size_t C1, size_t C2, size_t C3>
@@ -262,6 +236,7 @@ MATRIXSUBTRACTSP_TEMPLATE_CLASS(4, 4)
 
 };
 
+#include "LogScMatrix.tpp"
 #include "LogScMatrixAdd.tpp"
 #include "LogScMatrixSubtract.tpp"
 #include "LogScMatrixMultiply.tpp"
