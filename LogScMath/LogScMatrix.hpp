@@ -20,6 +20,7 @@ public:
     static constexpr size_t Rows = R;
     static constexpr size_t Cols = C;
 
+    // 构造和析构
     Matrix() noexcept;
     Matrix(std::initializer_list<std::initializer_list<T>> init) noexcept;
     Matrix(const Matrix& other) noexcept;
@@ -28,15 +29,89 @@ public:
     Matrix& operator=(Matrix&& other) noexcept;
     ~Matrix() = default;
 
+    // 取值
     inline T&       operator()(size_t row, size_t col) noexcept          {return matrix_arr[row][col];}
     inline const T& operator()(size_t row, size_t col) const noexcept    {return matrix_arr[row][col];}
     inline T*       operator[](size_t rc)              noexcept          {return matrix_arr[rc];      }
     inline const T* operator[](size_t rc)              const noexcept    {return matrix_arr[rc];      }
+
+    // 不要了
+    Matrix operator*() = delete;
+    bool operator==(const Matrix&) const = delete;
+    bool operator!=(const Matrix&) const = delete;
+
+    // 产生新的
+    inline Matrix operator++(int) noexcept {
+        Matrix temp = *this;
+        ++(*this);
+        return temp;
+    }
+    inline Matrix operator--(int) noexcept {
+        Matrix temp = *this;
+        --(*this);
+        return temp;
+    }
+    inline Matrix operator+() const noexcept {
+        return *this;
+    }
+    inline Matrix operator-() const noexcept {
+        Matrix result = *this;
+        for (size_t i = 0; i < R; ++i)
+            for (size_t j = 0; j < C; ++j)
+                result.matrix_arr[i][j] = -result.matrix_arr[i][j];
+        return result;
+    }
+
+    // 不产生新的
+    inline Matrix& operator+=(const Matrix& rhs) noexcept {
+        for (size_t i = 0; i < R; ++i)
+            for (size_t j = 0; j < C; ++j)
+                matrix_arr[i][j] += rhs.matrix_arr[i][j];
+        return *this;
+    }
+    inline Matrix& operator-=(const Matrix& rhs) noexcept {
+        for (size_t i = 0; i < R; ++i)
+            for (size_t j = 0; j < C; ++j)
+                matrix_arr[i][j] -= rhs.matrix_arr[i][j];
+        return *this;
+    }
+    inline Matrix& operator+=(const T& scalar) noexcept {
+        for (size_t i = 0; i < R; ++i)
+            for (size_t j = 0; j < C; ++j)
+                matrix_arr[i][j] += scalar;
+        return *this;
+    }
+    inline Matrix& operator-=(const T& scalar) noexcept {
+        for (size_t i = 0; i < R; ++i)
+            for (size_t j = 0; j < C; ++j)
+                matrix_arr[i][j] -= scalar;
+        return *this;
+    }
+    inline Matrix& operator*=(const T& scalar) noexcept {
+        for (size_t i = 0; i < R; ++i)
+            for (size_t j = 0; j < C; ++j)
+                matrix_arr[i][j] *= scalar;
+        return *this;
+    }
+    inline Matrix& operator/=(const T& scalar) noexcept {
+        for (size_t i = 0; i < R; ++i)
+            for (size_t j = 0; j < C; ++j)
+                matrix_arr[i][j] /= scalar;
+        return *this;
+    }
+    inline Matrix& operator++() noexcept {
+        return (*this += static_cast<T>(1));
+    }
+    inline Matrix& operator--() noexcept {
+        return (*this -= static_cast<T>(1));
+    }
 };
 /* ---- 乘法通用 ---- */
 template<typename T, size_t C1, size_t C2, size_t C3>
 constexpr void _multiply(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs, Matrix<T, C1, C3>& result) noexcept{
-    std::fill(&result[0][0], &result[0][0] + C1 * C3, T{0});
+    for (size_t i = 0; i < C1; ++i)
+        for (size_t j = 0; j < C3; ++j)
+            result[i][j] = T{0};
     for (size_t i = 0; i < C1; ++i)
         for (size_t k = 0; k < C2; ++k)
             for (size_t j = 0; j < C3; ++j)
@@ -107,7 +182,11 @@ constexpr void _divide(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C2>& rh
             }
         }
         if (tmp[pivot][i] == T{0}) {
-            std::fill(&result[0][0], &result[0][0] + C1 * C2, T{0});
+            for (size_t i = 0; i < C1; ++i) {
+                for (size_t j = 0; j < C2; ++j) {
+                    result[i][j] = T{0};
+                }
+            }
             return ;
         }
         if (pivot != i) {

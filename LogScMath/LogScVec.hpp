@@ -25,12 +25,11 @@ public:
 /* ---- 乘法通用 ---- */
 template<typename T, size_t C1, size_t C2>
 constexpr void __multiply_vc(const Vec<T, C1>& lhs, const Matrix<T, C1, C2>& rhs, Vec<T,C2>& result) noexcept{
-    std::fill(&result[0][0], &result[0][0] + 1 * C2, T{0});
-    for (size_t j = 0; j < C2; ++j) {
-        for (size_t i = 0; i < C1; ++i) {
+    for (size_t j = 0; j < C2; ++j) 
+        result[0][j] = T{0};
+    for (size_t j = 0; j < C2; ++j) 
+        for (size_t i = 0; i < C1; ++i) 
             result[0][j] += lhs[0][i] * rhs[i][j];
-        }
-    }
 };
 /* ---- 乘法泛化 ---- */
 template<typename T, size_t C1, size_t C2>
