@@ -20,7 +20,7 @@
 #ifndef BLUEPRINT_VULKANCONTEXT_H
 #define BLUEPRINT_VULKANCONTEXT_H
 
-#include <spane>
+#include <span>
 
 #include <X11/Xlib.h>
 

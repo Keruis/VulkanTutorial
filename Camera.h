@@ -20,8 +20,8 @@
 #ifndef _CAMERACLASS_H_
 #define _CAMERACLASS_H_
 
-#include "../Math/MMat.h"
-#include "../Math/MVec.h"
+#include "Math/MMat.h"
+#include "Math/MVec.h"
 
 class Camera {
 public:

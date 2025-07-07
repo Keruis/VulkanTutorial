@@ -26,7 +26,7 @@
 
 #include "Camera.h"
 #include "Input.h"
-#include "../Math/MMat.h"
+#include "Math/MMat.h"
 
 class CameraController {
 public:
