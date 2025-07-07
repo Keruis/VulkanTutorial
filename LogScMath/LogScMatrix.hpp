@@ -14,12 +14,11 @@ template<size_t Rows, size_t Cols> using MatrixLongLong   = LogSc::Matrix<long l
 template<typename T, size_t R,size_t C>
 class Matrix
 {
-private:
+protected:
     T matrix_arr[R][C];
 public:
     static constexpr const size_t Rows = R;
     static constexpr const size_t Cols = C;
-
 public:
     Matrix() noexcept {
         std::fill(&matrix_arr[0][0], &matrix_arr[0][0] + R * C, T{0});
@@ -55,10 +54,10 @@ public:
         return *this;
     }
     ~Matrix() = default;
-    inline T&       operator()(size_t row, size_t col) noexcept          {return matrix_arr[row][col];}
-    inline const T& operator()(size_t row, size_t col) const noexcept    {return matrix_arr[row][col];}
-    inline T*       operator[](size_t rc)              noexcept          {return matrix_arr[rc];      }
-    inline const T* operator[](size_t rc)              const noexcept    {return matrix_arr[rc];      }
+    T&       operator()(size_t row, size_t col) noexcept          {return matrix_arr[row][col];}
+    const T& operator()(size_t row, size_t col) const noexcept    {return matrix_arr[row][col];}
+    T*       operator[](size_t rc)              noexcept          {return matrix_arr[rc];      }
+    const T* operator[](size_t rc)              const noexcept    {return matrix_arr[rc];      }
 };
 /* ---- 乘法通用 ---- */
 template<typename T, size_t C1, size_t C2, size_t C3>
@@ -263,9 +262,9 @@ MATRIXSUBTRACTSP_TEMPLATE_CLASS(4, 4)
 
 };
 
-#include "LogScMatrixMultiply.tpp"
 #include "LogScMatrixAdd.tpp"
 #include "LogScMatrixSubtract.tpp"
+#include "LogScMatrixMultiply.tpp"
 
 #endif // __LOGSCMATRIX_H
 

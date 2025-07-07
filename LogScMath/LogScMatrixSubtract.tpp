@@ -1,5 +1,4 @@
 #include "LogScMatrix.hpp"
-
 #define TS_SUBTRACT(C1,C2) template<typename T> constexpr void MatrixSubtractSp<T,C1,C2>::subtract(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, Matrix<T, C1, C2>& result) noexcept{\
 printf("specialization %dx%d - %dx%d -> %dx%d\n",C1,C2,C1,C2,C1,C2);
     

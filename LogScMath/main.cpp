@@ -1,7 +1,9 @@
 #include<iostream>
 #include "LogScMatrix.hpp"
+#include "LogScVec.hpp"
 #include <random>
 #include <ctime>
+
 // print matrix
 template<typename T, size_t R, size_t C>
 void printMatrix(const LogSc::Matrix<T, R, C>& mat) {
@@ -11,6 +13,7 @@ void printMatrix(const LogSc::Matrix<T, R, C>& mat) {
         }
         std::cout << '\n';
     }
+    std::cout << '\n';
 }
 template<size_t Rows, size_t Cols>
 void randomInitialize(LogSc::MatrixInt<Rows, Cols>& mat, int minVal, int maxVal) {
@@ -31,7 +34,7 @@ void randomInitialize(LogSc::MatrixDouble<Rows, Cols>& mat, int minVal, int maxV
 int main() {
 
 
-// A * B
+// A * B Matrix Matrix
 /*
     {
         LogSc::MatrixInt<2,4> m24;
@@ -51,7 +54,7 @@ int main() {
     }
 */
 
-// A + B
+// A + B Matrix Matrix
 /*
     {
         LogSc::MatrixInt<2,3> m24_0,m24_1,result;
@@ -67,7 +70,7 @@ int main() {
     }
 */
 
-// A / B
+// A / B Matrix Matrix
 /*
     {
         LogSc::MatrixDouble<3,3>m24;
@@ -86,7 +89,7 @@ int main() {
     }
 */
 
-// A - B
+// A - B Matrix Matrix
 /*
     {
         LogSc::MatrixInt<2,3> m24_0,m24_1,result;
@@ -99,6 +102,48 @@ int main() {
 
         printMatrix(result);
         printMatrix(m24_0-m24_1);
+    }
+*/
+
+// A * B Vec Matrix
+/*
+    {
+        LogSc::VecInt<4> vc, result;
+        LogSc::MatrixInt<4,4> mc;
+        randomInitialize(vc,1,50);
+        randomInitialize(mc,1,50);
+        printMatrix(vc);
+        printMatrix(mc);
+        LogSc::MatrixMultiplySp<int,1,4,4>::multiply(vc,mc,result);
+        printMatrix(result);
+        LogSc::VecMatrixMultiplySp<int,4,4>::multiply(vc,mc,result);
+        printMatrix(result);
+    }
+*/
+// A + B Vec Vec
+/*
+    {
+        LogSc::Vec<int,4> vc1, vc2,result;
+        randomInitialize(vc1,1,50);
+        randomInitialize(vc2,1,50);
+        printMatrix(vc1);
+        printMatrix(vc2);
+        LogSc::VecMatrixAddSp<int,4>::add(vc1,vc2,result);
+        printMatrix(result);
+        printMatrix(vc1+vc2);
+    }
+*/
+// A - B Vec Vec
+/*
+    {
+        LogSc::Vec<int,4> vc1, vc2,result;
+        randomInitialize(vc1,1,50);
+        randomInitialize(vc2,1,50);
+        printMatrix(vc1);
+        printMatrix(vc2);
+        LogSc::VecMatrixSubtractSp<int,4>::subtract(vc1,vc2,result);
+        printMatrix(result);
+        printMatrix(vc1-vc2);
     }
 */
 
