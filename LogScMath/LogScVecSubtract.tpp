@@ -1,6 +1,5 @@
 #include "LogScVec.hpp"
-#define TS_SUBTRACT_VEC(C1) template< typename T> constexpr void VecMatrixSubtractSp<T, C1>::subtract(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept{\
-printf("specialization vec %dx%d - %dx%d -> %dx%d\n",1,C1,1,C1,1,C1);
+#define TS_SUBTRACT_VEC(C1) template< typename T> constexpr void VecMatrixSubtractSp<T, C1>::subtract(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept{
 
 namespace LogSc{
 

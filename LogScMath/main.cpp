@@ -33,6 +33,18 @@ void randomInitialize(LogSc::MatrixDouble<Rows, Cols>& mat, int minVal, int maxV
 }
 int main() {
 
+// Matrix And Value +/-*
+/*
+    {
+        LogSc::MatrixInt<4,4> m24,result;
+        randomInitialize(m24, 1, 50);
+        printMatrix(m24);
+        LogSc::MatrixFundamentalSp<int,4,4>::scalar_add_matrix(3,m24,result);
+        printMatrix(result);
+        LogSc::MatrixFundamentalSp<int,4,4>::scalar_mul_matrix(2,m24,result);
+        printMatrix(result);
+    }
+*/
 
 // A * B Matrix Matrix
 /*
@@ -143,7 +155,8 @@ int main() {
         printMatrix(vc2);
         LogSc::VecMatrixSubtractSp<int,4>::subtract(vc1,vc2,result);
         printMatrix(result);
-        printMatrix(vc1-vc2);
+        _scalar_add_matrix(100,vc1,result);
+        printMatrix(result);
     }
 */
 

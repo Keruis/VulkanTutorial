@@ -1,16 +1,15 @@
 #include "LogScMatrix.hpp"
-#define TS_SUBTRACT(C1,C2) template<typename T> constexpr void MatrixSubtractSp<T,C1,C2>::subtract(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, Matrix<T, C1, C2>& result) noexcept{\
-printf("specialization %dx%d - %dx%d -> %dx%d\n",C1,C2,C1,C2,C1,C2);
+#define TS_SUBTRACT(C1,C2) template<typename T> constexpr void MatrixSubtractSp<T,C1,C2>::subtract(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs, Matrix<T, C1, C2>& result) noexcept{
     
 namespace LogSc  {
     
     // 2x2 矩阵减法
     TS_SUBTRACT(2,2)
-        result[0][0] = lhs[0][0]-rhs[0][0];
-        result[0][1] = lhs[0][1]-rhs[0][1];
+        result[0][0] = lhs[0][0] - rhs[0][0];
+        result[0][1] = lhs[0][1] - rhs[0][1];
 
-        result[1][0] = lhs[1][0]-rhs[1][0];
-        result[1][1] = lhs[1][1]-rhs[1][1];
+        result[1][0] = lhs[1][0] - rhs[1][0];
+        result[1][1] = lhs[1][1] - rhs[1][1];
     }
 
     // 2x3 矩阵减法

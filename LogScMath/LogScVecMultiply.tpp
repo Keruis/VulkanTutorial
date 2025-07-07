@@ -1,6 +1,5 @@
 #include "LogScVec.hpp"
-#define TS_MULTIPLY_VEC(C1,C2) template<typename T> constexpr void  VecMatrixMultiplySp<T,C1,C2>::multiply(const Vec<T, C1>& lhs, const Matrix<T, C1, C2>& rhs, Vec<T,C2>& result) noexcept{\
-printf("specialization vec %dx%d x %dx%d -> %dx%d\n",1,C1,C1,C2,1,C2);
+#define TS_MULTIPLY_VEC(C1,C2) template< typename T> constexpr void  VecMatrixMultiplySp<T,C1,C2>::multiply(const Vec<T, C1>& lhs, const Matrix<T, C1, C2>& rhs, Vec<T,C2>& result) noexcept{
 
 namespace LogSc{
     // 1. 1×2 × 2×2 -> 1×2
