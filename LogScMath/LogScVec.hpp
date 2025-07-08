@@ -17,7 +17,7 @@ class Vec: public Matrix<T, 1, C>
 {
 public:
     Vec() noexcept :Matrix<T, 1, C>(){}
-    Vec(std::initializer_list<T> init)noexcept :Matrix<T, 1, C>({init}){}
+    Vec(std::initializer_list<T> init)noexcept :Matrix<T, 1, C>(init){}
     ~Vec() = default;
 };
 /// -------------- 针对 向量 和 矩阵 --------------
@@ -121,7 +121,6 @@ struct VecMatrixSubtractSp<T, C1> {\
 VECMATRIXSUBTRACTSP_TEMPLATE_CLASS(2)
 VECMATRIXSUBTRACTSP_TEMPLATE_CLASS(3)
 VECMATRIXSUBTRACTSP_TEMPLATE_CLASS(4)
-
 
 };
 #include "LogScVecAdd.tpp"

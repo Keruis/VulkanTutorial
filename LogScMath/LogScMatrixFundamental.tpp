@@ -3,6 +3,7 @@
 template<typename T> constexpr void MatrixFundamentalSp<T, R, C>::FUNCTION(const T& scalar,const Matrix<T, R, C>& mat,Matrix<T, R, C>& result) noexcept{
 #define TS_FUNDAMENTAL_MS(R,C,FUNCTION)\
 template<typename T> constexpr void MatrixFundamentalSp<T, R, C>::FUNCTION(const Matrix<T, R, C>& mat,const T& scalar,Matrix<T, R, C>& result) noexcept{
+
 namespace LogSc {
 
     // 2x2

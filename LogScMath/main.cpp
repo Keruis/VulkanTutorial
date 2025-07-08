@@ -33,15 +33,26 @@ void randomInitialize(LogSc::MatrixDouble<Rows, Cols>& mat, int minVal, int maxV
 }
 int main() {
 
-// Matrix And Value +/-*
+// Matrix And Matrix Compare
+// /*
+    LogSc::MatrixDouble<2,2> m22,result;
+    randomInitialize(m22, 1, 50);
+    randomInitialize(result, 1, 50);
+    if(m22!=result)
+        printf("!=\n");
+    else
+        printf("==\n");
+// */
+// Matrix And Value +/-* AND Value And Matrix +/-*
 /*
     {
-        LogSc::MatrixDouble<4,3> m42,result;
+        LogSc::MatrixDouble<2,2> m42,result;
         randomInitialize(m42, 1, 50);
         printMatrix(m42);
-        LogSc::MatrixFundamentalSp<double,4,3>::scalar_add_matrix(3,m42,result);
+        LogSc::MatrixFundamentalSp<double,2,2>::scalar_add_matrix(3,m42,result);
         printMatrix(result);
-        LogSc::MatrixFundamentalSp<double,4,3>::scalar_mul_matrix(2,m42,result);
+        LogSc::MatrixFundamentalSp<double,2,2>::scalar_mul_matrix(2,m42,result);
+        printMatrix(result);
         printMatrix(1000.0*m42);
         printMatrix(1000.0+m42);
         printMatrix(1000.0-m42);
@@ -72,7 +83,6 @@ int main() {
         printMatrix(m24*m42);
     }
 */
-
 // A + B Matrix Matrix
 /*
     {
@@ -88,7 +98,6 @@ int main() {
         printMatrix(m24_0+m24_1);
     }
 */
-
 // A / B Matrix Matrix
 /*
     {
@@ -107,7 +116,6 @@ int main() {
         
     }
 */
-
 // A - B Matrix Matrix
 /*
     {
@@ -123,7 +131,6 @@ int main() {
         printMatrix(m24_0-m24_1);
     }
 */
-
 // A * B Vec Matrix
 /*
     {
