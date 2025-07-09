@@ -15,7 +15,7 @@ namespace LogSc {
             matrix_arr[i++] = val;
         }
         for (; i < R * C; ++i) {
-            matrix_arr[i] = T{};
+            matrix_arr[i] = T{0};
         }
     }
     template<typename T, size_t R, size_t C>

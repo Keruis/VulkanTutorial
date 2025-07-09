@@ -63,60 +63,60 @@ VECMATRIXMULTIPLYSP_TEMPLATE_CLASS(4,4)
 
 /// -------------- 针对 向量 和 向量 --------------
 /* ---- 加法通用 ---- */
-template<typename T, size_t C1>
-constexpr void __add_vec(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept {
-    for (size_t i = 0; i < C1; ++i)
+template<typename T, size_t C>
+constexpr void __add_vec(const Vec<T, C>& lhs, const Vec<T, C>& rhs, Vec<T, C>& result) noexcept {
+    for (size_t i = 0; i < C; ++i)
         result[0][i] = lhs[0][i] + rhs[0][i];
 }
 /* ---- 加法泛化 ---- */
-template<typename T, size_t C1>
+template<typename T, size_t C>
 struct VecMatrixAddSp {
-    constexpr static void add(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept{
+    constexpr static void add(const Vec<T, C>& lhs, const Vec<T, C>& rhs, Vec<T, C>& result) noexcept{
         __add_vec(lhs,rhs,result);
     }
 };
 /* ---- 加法重载 ---- */
-template<typename T, size_t C1>
-constexpr Vec<T, C1> operator+(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs) noexcept{
-    Vec<T, C1> result;
-    LogSc::VecMatrixAddSp<T,C1>::add(lhs,rhs,result);
+template<typename T, size_t C>
+constexpr Vec<T, C> operator+(const Vec<T, C>& lhs, const Vec<T, C>& rhs) noexcept{
+    Vec<T, C> result;
+    LogSc::VecMatrixAddSp<T,C>::add(lhs,rhs,result);
     return result;
 }
 /* ---- 加法特化 ---- */
-#define VECMATRIXADDSP_TEMPLATE_CLASS(C1) \
+#define VECMATRIXADDSP_TEMPLATE_CLASS(C) \
 template<typename T>\
-struct VecMatrixAddSp<T, C1> {\
-    constexpr static void add(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept;\
+struct VecMatrixAddSp<T, C> {\
+    constexpr static void add(const Vec<T, C>& lhs, const Vec<T, C>& rhs, Vec<T, C>& result) noexcept;\
 };
 VECMATRIXADDSP_TEMPLATE_CLASS(2)
 VECMATRIXADDSP_TEMPLATE_CLASS(3)
 VECMATRIXADDSP_TEMPLATE_CLASS(4)
 
 /* ---- 减法通用 ---- */
-template<typename T, size_t C1>
-constexpr void __subtract_vec(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept {
-    for (size_t i = 0; i < C1; ++i) 
+template<typename T, size_t C>
+constexpr void __subtract_vec(const Vec<T, C>& lhs, const Vec<T, C>& rhs, Vec<T, C>& result) noexcept {
+    for (size_t i = 0; i < C; ++i) 
         result[0][i] = lhs[0][i] - rhs[0][i];
 }
 /* ---- 减法泛化 ---- */
-template<typename T, size_t C1>
+template<typename T, size_t C>
 struct VecMatrixSubtractSp {
-    constexpr static void subtract(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept{
+    constexpr static void subtract(const Vec<T, C>& lhs, const Vec<T, C>& rhs, Vec<T, C>& result) noexcept{
         __subtract_vec(lhs,rhs,result);
     }
 };
 /* ---- 减法重载 ---- */
-template<typename T, size_t C1>
-constexpr Vec<T, C1> operator-(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs) noexcept{
-    Vec<T, C1> result;
-    LogSc::VecMatrixSubtractSp<T,C1>::subtract(lhs,rhs,result);
+template<typename T, size_t C>
+constexpr Vec<T, C> operator-(const Vec<T, C>& lhs, const Vec<T, C>& rhs) noexcept{
+    Vec<T, C> result;
+    LogSc::VecMatrixSubtractSp<T,C>::subtract(lhs,rhs,result);
     return result;
 }
-/* ---- 加法特化 ---- */
-#define VECMATRIXSUBTRACTSP_TEMPLATE_CLASS(C1) \
+/* ---- 减法特化 ---- */
+#define VECMATRIXSUBTRACTSP_TEMPLATE_CLASS(C) \
 template<typename T>\
-struct VecMatrixSubtractSp<T, C1> {\
-    constexpr static void subtract(const Vec<T, C1>& lhs, const Vec<T, C1>& rhs, Vec<T, C1>& result) noexcept;\
+struct VecMatrixSubtractSp<T, C> {\
+    constexpr static void subtract(const Vec<T, C>& lhs, const Vec<T, C>& rhs, Vec<T, C>& result) noexcept;\
 };
 VECMATRIXSUBTRACTSP_TEMPLATE_CLASS(2)
 VECMATRIXSUBTRACTSP_TEMPLATE_CLASS(3)

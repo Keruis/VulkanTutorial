@@ -33,16 +33,39 @@ void randomInitialize(LogSc::MatrixDouble<Rows, Cols>& mat, int minVal, int maxV
 }
 int main() {
 
+// Matrix Compound
+/*
+    {
+        LogSc::MatrixDouble<2,2> result,result2;
+        randomInitialize(result, 1, 50);
+        result2=result;
+        printMatrix(result);
+        printMatrix(result2+result);
+        result-=1.0;
+        printMatrix(result);
+        result+=2.0;
+        printMatrix(result);
+        printMatrix(result++);
+        printMatrix(++result);
+        result*=10000.0;
+        printMatrix(result);
+        result/=10000.0;
+        printMatrix(result);
+    }
+*/
+
 // Matrix And Matrix Compare
-// /*
+/*
     LogSc::MatrixDouble<2,2> m22,result;
     randomInitialize(m22, 1, 50);
     randomInitialize(result, 1, 50);
+    printMatrix(m22);
+    printMatrix(result);
     if(m22!=result)
         printf("!=\n");
     else
         printf("==\n");
-// */
+*/
 // Matrix And Value +/-* AND Value And Matrix +/-*
 /*
     {

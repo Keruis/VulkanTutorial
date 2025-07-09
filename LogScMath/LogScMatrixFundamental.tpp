@@ -6,7 +6,6 @@ template<typename T> constexpr void MatrixFundamentalSp<T, R, C>::FUNCTION(const
 
 namespace LogSc {
 
-    // 2x2
     TS_FUNDAMENTAL_SM(2, 2, scalar_add_matrix)
         result[0][0] = scalar + mat[0][0];
         result[0][1] = scalar + mat[0][1];
