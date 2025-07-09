@@ -5,11 +5,11 @@ namespace LogSc {
     
     // 2x2 Matrix addition
     TS_ADD(2,2)
-        result[0][0] = lhs[0][0]+rhs[0][0];
-        result[0][1] = lhs[0][1]+rhs[0][1];
+        result[0][0] = lhs[0][0] + rhs[0][0];
+        result[0][1] = lhs[0][1] + rhs[0][1];
 
-        result[1][0] = lhs[1][0]+rhs[1][0];
-        result[1][1] = lhs[1][1]+rhs[1][1];
+        result[1][0] = lhs[1][0] + rhs[1][0];
+        result[1][1] = lhs[1][1] + rhs[1][1];
     }
 
     // 2x3 Matrix addition

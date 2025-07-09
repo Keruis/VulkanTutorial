@@ -2,7 +2,7 @@
 #define TS_COMPARE(C1,C2) template<typename T> constexpr bool MatrixCompareSp<T, C1, C2>::compare(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs) noexcept{
 namespace LogSc {
 
-    TS_COMPARE(2, 2) 
+    TS_COMPARE(2, 2)
         return
             lhs[0][0] == rhs[0][0] && lhs[0][1] == rhs[0][1] &&
             lhs[1][0] == rhs[1][0] && lhs[1][1] == rhs[1][1];

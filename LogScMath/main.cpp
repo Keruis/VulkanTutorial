@@ -39,6 +39,7 @@ int main() {
         LogSc::MatrixDouble<2,2> result,result2;
         randomInitialize(result, 1, 50);
         result2=result;
+        result==result2;
         printMatrix(result);
         printMatrix(result2+result);
         result-=1.0;
@@ -194,6 +195,11 @@ int main() {
         printMatrix(result);
         _scalar_add_matrix(100,vc1,result);
         printMatrix(result);
+        printMatrix(vc1-vc2);
+        vc1++;
+        --vc1;
+        printMatrix(vc1);
+        vc1+vc2;
     }
 */
 

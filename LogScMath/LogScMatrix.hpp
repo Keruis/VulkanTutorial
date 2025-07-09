@@ -2,6 +2,7 @@
 #define __LOGSCMATRIX_H
 #include <cstddef>
 #include <initializer_list>
+#define OPTIMIZE_FOR
 
 namespace LogSc {
 template<typename T, size_t R,size_t C>class Matrix;
@@ -17,8 +18,9 @@ class alignas(16) Matrix
 {
     static_assert(std::is_arithmetic<T>::value, "Matrix requires arithmetic scalar type");
 public:    
-    static constexpr size_t Rows = R;
-    static constexpr size_t Cols = C;
+    constexpr static size_t  Rows = R;
+    constexpr static size_t  Cols = C;
+
 protected:
     alignas(16) T matrix_arr[R * C];
 public:
@@ -29,6 +31,9 @@ public:
     constexpr Matrix& operator=(const Matrix& other) noexcept;
     constexpr Matrix& operator=(Matrix&& other) noexcept;
     ~Matrix() = default;
+
+    inline T&           data(size_t pos) noexcept         {return matrix_arr[pos] ;}
+    inline const T&     data(size_t pos) const noexcept   {return matrix_arr[pos] ;}
 
     inline T&       operator()(size_t row, size_t col) noexcept                   { return matrix_arr[row * C + col];}
     inline const T& operator()(size_t row, size_t col) const noexcept             { return matrix_arr[row * C + col];}
@@ -185,10 +190,16 @@ struct MatrixDivideSp<T, C1, C2> {\
 /* ---- 加法通用 ---- */
 template<typename T, size_t R,size_t C>
 constexpr void _add(const Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs, Matrix<T, R, C>& result) noexcept{
+#ifdef OPTIMIZE_FOR
+    for(size_t i = 0; i < R * C; ++i) 
+        result.data(i) = lhs.data(i) + rhs.data(i);
+#else
     for (size_t i = 0; i < R; ++i) 
         for (size_t j = 0; j < C; ++j)
             result[i][j] = lhs[i][j] + rhs[i][j];
+#endif
 }
+
 /* ---- 加法泛化 ---- */
 template<typename T, size_t R, size_t C>
 struct MatrixAddSp {
@@ -219,11 +230,16 @@ MATRIXADDSP_TEMPLATE_CLASS(4, 2)
 MATRIXADDSP_TEMPLATE_CLASS(4, 3)
 MATRIXADDSP_TEMPLATE_CLASS(4, 4)
 /* ---- 减法通用 ---- */
-template<typename T, size_t R,size_t C>
-constexpr void _subtract(const Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs, Matrix<T, R, C>& result) noexcept{
+template<typename T, size_t R, size_t C>
+constexpr void _subtract(const Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs, Matrix<T, R, C>& result) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i) 
+        result.data(i) = lhs.data(i) - rhs.data(i);
+#else
     for (size_t i = 0; i < R; ++i) 
         for (size_t j = 0; j < C; ++j)
             result[i][j] = lhs[i][j] - rhs[i][j];
+#endif
 }
 /* ---- 减法泛化 ---- */
 template<typename T, size_t R, size_t C>
@@ -256,48 +272,78 @@ MATRIXSUBTRACTSP_TEMPLATE_CLASS(4, 3)
 MATRIXSUBTRACTSP_TEMPLATE_CLASS(4, 4)
 /* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 （通用） ---- */
 template<typename T, size_t R, size_t C>
-constexpr void _scalar_add_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept{
+constexpr void _scalar_add_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i) 
+        result.data(i) = scalar + mat.data(i);
+#else
     for (size_t i = 0; i < R; ++i)
         for (size_t j = 0; j < C; ++j)
             result[i][j] = scalar + mat[i][j];
+#endif
 }
 template<typename T, size_t R, size_t C>
 constexpr void _matrix_add_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept{
     _scalar_add_matrix(scalar,mat,result);
 }
 template<typename T, size_t R, size_t C>
-constexpr void _scalar_sub_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept{
+constexpr void _scalar_sub_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i) 
+        result.data(i) = scalar - mat.data(i);
+#else
     for (size_t i = 0; i < R; ++i)
         for (size_t j = 0; j < C; ++j)
             result[i][j] = scalar - mat[i][j];
+#endif
 }
 template<typename T, size_t R, size_t C>
-constexpr void _matrix_sub_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept{
+constexpr void _matrix_sub_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i) 
+        result.data(i) = mat.data(i) - scalar;
+#else
     for (size_t i = 0; i < R; ++i)
         for (size_t j = 0; j < C; ++j)
             result[i][j] = mat[i][j] - scalar;
+#endif
 }
 template<typename T, size_t R, size_t C>
-constexpr void _scalar_mul_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept{
+constexpr void _scalar_mul_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i)
+        result.data(i) = scalar * mat.data(i);
+#else
     for (size_t i = 0; i < R; ++i)
         for (size_t j = 0; j < C; ++j)
             result[i][j] = scalar * mat[i][j];
+#endif
 }
 template<typename T, size_t R, size_t C>
-constexpr void _matrix_mul_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept{
-    _scalar_mul_matrix(scalar,mat,result);
+constexpr void _matrix_mul_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept {
+    _scalar_mul_matrix(scalar, mat, result);  // 复用标量乘法，顺序无影响
 }
 template<typename T, size_t R, size_t C>
-constexpr void _scalar_div_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept{
+constexpr void _scalar_div_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i) 
+        result.data(i) = scalar / mat.data(i);
+#else
     for (size_t i = 0; i < R; ++i)
         for (size_t j = 0; j < C; ++j)
             result[i][j] = scalar / mat[i][j];
+#endif
 }
 template<typename T, size_t R, size_t C>
-constexpr void _matrix_div_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept{
+constexpr void _matrix_div_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i) 
+        result.data(i) = mat.data(i) / scalar;
+#else
     for (size_t i = 0; i < R; ++i)
         for (size_t j = 0; j < C; ++j)
             result[i][j] = mat[i][j] / scalar;
+#endif
 }
 /* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 最好实现（泛化） ---- */
 template<typename T, size_t R, size_t C>
@@ -400,12 +446,18 @@ MATRIXFUNDAMENTALSP_TEMPLATE_CLASS(4,2)
 MATRIXFUNDAMENTALSP_TEMPLATE_CLASS(4,3)
 MATRIXFUNDAMENTALSP_TEMPLATE_CLASS(4,4)
 /* ---- 作比较通用 ---- */
-template<typename T, size_t C1, size_t C2>
-constexpr bool _compare(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs) noexcept {
-    for (size_t i = 0; i < C1; ++i)
-        for (size_t j = 0; j < C2; ++j)
-            if (lhs[i][j] != rhs[i][j]) 
+template<typename T, size_t R, size_t C>
+constexpr bool _compare(const Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs) noexcept {
+#ifdef OPTIMIZE_FOR
+    for (size_t i = 0; i < R * C; ++i)
+        if (lhs.data(i) != rhs.data(i))
+            return false;
+#else
+    for (size_t i = 0; i < R; ++i)
+        for (size_t j = 0; j < C; ++j)
+            if (lhs[i][j] != rhs[i][j])
                 return false;
+#endif
     return true;
 }
 /* ---- 作比较泛化 ---- */

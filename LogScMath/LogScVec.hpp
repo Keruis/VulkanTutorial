@@ -13,10 +13,11 @@ template<size_t Cols> using VecLongLong   = LogSc::Vec<long long, Cols>;
 
 /// -------------- Vec属于特殊矩阵 --------------
 template<typename T,size_t C>
-class Vec: public Matrix<T, 1, C>
+class alignas(16) Vec: public Matrix<T, 1, C>
 {
+    static_assert(std::is_arithmetic<T>::value, "Matrix requires arithmetic scalar type");
 public:
-    Vec() noexcept :Matrix<T, 1, C>(){}
+    Vec() noexcept : Matrix<T, 1, C>(){}
     Vec(std::initializer_list<T> init)noexcept :Matrix<T, 1, C>(init){}
     ~Vec() = default;
 };
