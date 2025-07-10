@@ -552,5 +552,12 @@ constexpr Matrix<T, R, C> operator--(Matrix<T, R, C>& mat, int) noexcept {
 #include "LogScMatrixMultiply.tpp"
 #include "LogScMatrixFundamental.tpp"
 #include "LogScMatrixCompare.tpp"
+#undef OPTIMIZE_FOR
+#undef MATRIXMULTIPLYSP_TEMPLATE_CLASS
+#undef MATRIXDIVIDESP_TEMPLATE_CLASS
+#undef MATRIXADDSP_TEMPLATE_CLASS
+#undef MATRIXSUBTRACTSP_TEMPLATE_CLASS
+#undef MATRIXFUNDAMENTALSP_TEMPLATE_CLASS
+#undef MATRIXCOMPARESP_TEMPLATE_CLASS
 #endif // __LOGSCMATRIX_H
 

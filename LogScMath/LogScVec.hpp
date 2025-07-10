@@ -248,7 +248,7 @@ VECMATRIXFUNDAMENTALSP_TEMPLATE_CLASS(4)
 /* ---- 作比较通用 ---- */
 template<typename T, size_t C>
 constexpr bool __compare_vec(const Vec<T, C>& lhs, const Vec<T, C>& rhs) noexcept {
-#ifdef OPTIMIZE_FOR
+#ifdef OPTIMIZE_VEC_FOR
     for (size_t i = 0; i < C; ++i)
         if (lhs.data(i) != rhs.data(i))
             return false;
@@ -343,4 +343,10 @@ constexpr Vec<T, C> operator--(Vec<T, C>& vec, int) noexcept {
 #include "LogScVecMultiply.tpp"
 #include "LogScVecFundamental.tpp"
 #include "LogScVecCompare.tpp"
+#undef OPTIMIZE_VEC_FOR
+#undef VECMATRIXMULTIPLYSP_TEMPLATE_CLASS
+#undef VECMATRIXADDSP_TEMPLATE_CLASS
+#undef VECMATRIXSUBTRACTSP_TEMPLATE_CLASS
+#undef VECMATRIXFUNDAMENTALSP_TEMPLATE_CLASS
+#undef VECMATRIXCOMPARESP_TEMPLATE_CLASS
 #endif // __LOGSCVEC_H
