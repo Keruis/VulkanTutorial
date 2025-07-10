@@ -1,5 +1,4 @@
 #include<iostream>
-#include "LogScMatrix.hpp"
 #include "LogScVec.hpp"
 #include <random>
 #include <ctime>
@@ -32,6 +31,19 @@ void randomInitialize(LogSc::MatrixDouble<Rows, Cols>& mat, int minVal, int maxV
     }
 }
 int main() {
+
+// Vec base op
+    LogSc::Vec<double,2>vc,vc2;
+    randomInitialize(vc,1,50);
+    vc2=vc;
+    printMatrix(vc);
+    printMatrix((vc2+=vc));
+    printMatrix(vc++);
+    printMatrix(++vc);
+    printMatrix((vc+=2.0));
+    printMatrix((vc-=3.0));
+    printMatrix((vc*=10000.0));
+    printMatrix((vc/=10000.0));
 
 // Matrix Compound
 /*

@@ -69,7 +69,7 @@ struct MatrixMultiplySp {
 template<typename T, size_t C1, size_t C2, size_t C3>
 constexpr Matrix<T, C1, C3> operator*(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C3>& rhs) noexcept {
     Matrix<T, C1, C3> result;
-    LogSc::MatrixMultiplySp<T,C1,C2,C3>::multiply(lhs,rhs,result);
+    LogSc::MatrixMultiplySp<T, C1, C2, C3>::multiply(lhs,rhs,result);
     return result;
 }
 /* ----  乘法特化 ---- */
@@ -169,7 +169,7 @@ struct MatrixDivideSp {
 template<typename T, size_t C1, size_t C2>
 constexpr Matrix<T, C1, C2> operator/(const Matrix<T, C1, C2>& lhs, const Matrix<T, C2, C2>& rhs) noexcept{
     Matrix<T, C1, C2> result;
-    LogSc::MatrixDivideSp<T,C1,C2>::divide(lhs,rhs,result);
+    LogSc::MatrixDivideSp<T, C1, C2>::divide(lhs,rhs,result);
     return result;
 }
 /* ---- 除法特化 ---- */
@@ -211,7 +211,7 @@ struct MatrixAddSp {
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator+(const Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs) noexcept{
     Matrix<T, R, C> result;
-    LogSc::MatrixAddSp<T,R,C>::add(lhs,rhs,result);
+    LogSc::MatrixAddSp<T, R, C>::add(lhs,rhs,result);
     return result;
 }
 /* ---- 加法特化 ---- */
@@ -252,7 +252,7 @@ struct MatrixSubtractSp {
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator-(const Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs) noexcept{
     Matrix<T, R, C> result;
-    LogSc::MatrixSubtractSp<T,R,C>::subtract(lhs,rhs,result);
+    LogSc::MatrixSubtractSp<T, R, C>::subtract(lhs,rhs,result);
     return result;
 }
 /* ---- 减法特化 ---- */
@@ -321,7 +321,7 @@ constexpr void _scalar_mul_matrix(const T& scalar, const Matrix<T, R, C>& mat, M
 }
 template<typename T, size_t R, size_t C>
 constexpr void _matrix_mul_scalar(const Matrix<T, R, C>& mat, const T& scalar, Matrix<T, R, C>& result) noexcept {
-    _scalar_mul_matrix(scalar, mat, result);  // 复用标量乘法，顺序无影响
+    _scalar_mul_matrix(scalar, mat, result);
 }
 template<typename T, size_t R, size_t C>
 constexpr void _scalar_div_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept {
@@ -345,7 +345,7 @@ constexpr void _matrix_div_scalar(const Matrix<T, R, C>& mat, const T& scalar, M
             result[i][j] = mat[i][j] / scalar;
 #endif
 }
-/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 最好实现（泛化） ---- */
+/* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 （泛化） ---- */
 template<typename T, size_t R, size_t C>
 struct MatrixFundamentalSp {
     constexpr static void scalar_add_matrix(const T& scalar, const Matrix<T, R, C>& mat, Matrix<T, R, C>& result) noexcept {
@@ -377,49 +377,49 @@ struct MatrixFundamentalSp {
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator+(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::scalar_add_matrix(scalar,mat,result);
+    MatrixFundamentalSp<T, R, C>::scalar_add_matrix(scalar,mat,result);
     return result;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator+(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::matrix_add_scalar(mat,scalar,result);
+    MatrixFundamentalSp<T, R, C>::matrix_add_scalar(mat,scalar,result);
     return result;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator-(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::scalar_sub_matrix(scalar,mat,result);
+    MatrixFundamentalSp<T, R, C>::scalar_sub_matrix(scalar,mat,result);
     return result;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator-(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::matrix_sub_scalar(mat,scalar,result);
+    MatrixFundamentalSp<T, R, C>::matrix_sub_scalar(mat,scalar,result);
     return result;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator*(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::scalar_mul_matrix(scalar,mat,result);
+    MatrixFundamentalSp<T, R, C>::scalar_mul_matrix(scalar,mat,result);
     return result;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator*(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::matrix_mul_scalar(mat,scalar,result);
+    MatrixFundamentalSp<T, R, C>::matrix_mul_scalar(mat,scalar,result);
     return result;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator/(const T& scalar, const Matrix<T, R, C>& mat) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::scalar_div_matrix(scalar,mat,result);
+    MatrixFundamentalSp<T, R, C>::scalar_div_matrix(scalar,mat,result);
     return result;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator/(const Matrix<T, R, C>& mat, const T& scalar) noexcept{
     Matrix<T, R, C> result;
-    MatrixFundamentalSp<T,R,C>::matrix_div_scalar(mat,scalar,result);
+    MatrixFundamentalSp<T, R, C>::matrix_div_scalar(mat,scalar,result);
     return result;
 }    
 /* ---- 数乘 乘数 数除 除数 数加 加数 数减 减数 （特化） ---- */
@@ -470,11 +470,11 @@ struct MatrixCompareSp {
 /* ---- 作比较重载 ---- */
 template<typename T, size_t C1, size_t C2>
 constexpr bool operator==(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs) noexcept{
-    return LogSc::MatrixCompareSp<T,C1,C2>::compare(lhs,rhs);
+    return LogSc::MatrixCompareSp<T, C1, C2>::compare(lhs,rhs);
 }
 template<typename T, size_t C1, size_t C2>
 constexpr bool operator!=(const Matrix<T, C1, C2>& lhs, const Matrix<T, C1, C2>& rhs) noexcept{
-    return !LogSc::MatrixCompareSp<T,C1,C2>::compare(lhs,rhs);
+    return !LogSc::MatrixCompareSp<T, C1, C2>::compare(lhs,rhs);
 }
 /* ---- 作比较特化 ---- */
 #define MATRIXCOMPARESP_TEMPLATE_CLASS(C1,C2) \
@@ -495,43 +495,43 @@ MATRIXCOMPARESP_TEMPLATE_CLASS(4, 4)
 /* ---- 复合重载 ---- */
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C>& operator+=(Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs) noexcept{
-    LogSc::MatrixAddSp<T,R,C>::add(lhs,rhs,lhs);
+    LogSc::MatrixAddSp<T, R, C>::add(lhs,rhs,lhs);
     return lhs;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C>& operator-=(Matrix<T, R, C>& lhs, const Matrix<T, R, C>& rhs) noexcept{
-    LogSc::MatrixSubtractSp<T,R,C>::subtract(lhs,rhs,lhs);
+    LogSc::MatrixSubtractSp<T, R, C>::subtract(lhs,rhs,lhs);
     return lhs;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C>& operator+=(Matrix<T, R, C>& mat, const T& scalar) noexcept {
-    LogSc::MatrixFundamentalSp<T,R,C>::matrix_add_scalar(mat,scalar,mat);
+    LogSc::MatrixFundamentalSp<T, R, C>::matrix_add_scalar(mat,scalar,mat);
     return mat;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C>& operator-=(Matrix<T, R, C>& mat, const T& scalar) noexcept {
-    LogSc::MatrixFundamentalSp<T,R,C>::matrix_sub_scalar(mat,scalar,mat);
+    LogSc::MatrixFundamentalSp<T, R, C>::matrix_sub_scalar(mat,scalar,mat);
     return mat;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C>& operator*=(Matrix<T, R, C>& mat, const T& scalar) noexcept {
-    LogSc::MatrixFundamentalSp<T,R,C>::matrix_mul_scalar(mat,scalar,mat);
+    LogSc::MatrixFundamentalSp<T, R, C>::matrix_mul_scalar(mat,scalar,mat);
     return mat;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C>& operator/=(Matrix<T, R, C>& mat, const T& scalar) noexcept {
-    LogSc::MatrixFundamentalSp<T,R,C>::matrix_div_scalar(mat,scalar,mat);
+    LogSc::MatrixFundamentalSp<T, R, C>::matrix_div_scalar(mat,scalar,mat);
     return mat;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C>& operator++(Matrix<T, R, C>& mat) noexcept{
-    LogSc::MatrixFundamentalSp<T,R,C>::matrix_add_scalar(mat,T{1},mat);
+    LogSc::MatrixFundamentalSp<T, R, C>::matrix_add_scalar(mat,T{1},mat);
     return mat;
 }
 template<typename T, size_t R, size_t C>
 constexpr Matrix<T, R, C> operator++(Matrix<T, R, C>& mat, int) noexcept{
     Matrix<T, R, C> result = mat;
-    LogSc::MatrixFundamentalSp<T,R,C>::matrix_add_scalar(mat,T{1},mat);
+    LogSc::MatrixFundamentalSp<T, R, C>::matrix_add_scalar(mat,T{1},mat);
     return result;
 }
 template<typename T, size_t R, size_t C>
@@ -552,6 +552,5 @@ constexpr Matrix<T, R, C> operator--(Matrix<T, R, C>& mat, int) noexcept {
 #include "LogScMatrixMultiply.tpp"
 #include "LogScMatrixFundamental.tpp"
 #include "LogScMatrixCompare.tpp"
-
 #endif // __LOGSCMATRIX_H
 
